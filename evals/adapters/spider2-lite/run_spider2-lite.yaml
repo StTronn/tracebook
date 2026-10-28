@@ -1,0 +1,20 @@
+# From the repo root:  harbor run -c evals/adapters/spider2-lite/run_spider2-lite.yaml [--job-name X]
+jobs_dir: evals/jobs
+n_attempts: 1
+timeout_multiplier: 1.0
+orchestrator:
+  type: local
+  n_concurrent_trials: 4
+  quiet: false
+environment:
+  type: docker
+  force_build: true
+  delete: true
+  # env:
+  #   ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+agents:
+  - name: oracle
+  # - name: claude-code
+  #   model_name: anthropic/claude-haiku-4-5
+datasets:
+  - path: evals/tasks/spider2-lite

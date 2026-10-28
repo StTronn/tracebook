@@ -1,0 +1,24 @@
+# Python / uv
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+dist/
+build/
+
+# web (viewer build output is committed at src/tracebook/viewer/, shipped in the wheel)
+node_modules/
+*.tsbuildinfo
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# secrets
+.env
+.env.*
+
+# workspace state of the example workspaces (database, results, history) is rebuilt by `tracebook import` / `check`
+examples/*/.tracebook/

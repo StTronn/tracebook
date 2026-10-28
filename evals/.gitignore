@@ -1,0 +1,10 @@
+# downloaded benchmark sources (Spider2 repo files, local SQLite zip), generated Harbor tasks, Harbor job output
+.cache/
+tasks/
+jobs/
+
+# local secrets for harbor --env-file (ANTHROPIC_API_KEY=...)
+.env
+
+# uv run --project evals/adapters/<name> artifacts
+adapters/*/.venv/

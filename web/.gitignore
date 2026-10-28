@@ -1,0 +1,5 @@
+node_modules
+*.tsbuildinfo
+# re-include what the repo-root .gitignore drops (`lib/`, `package-lock.json`): viewer sources + pinned lockfile
+!src/lib/
+!package-lock.json

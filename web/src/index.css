@@ -1,0 +1,211 @@
+/* Tracebook viewer theme: smui (smui.statico.io, Nord-based terminal look) with a darker, near-black dark mode.
+   Every token is a plain CSS variable → a project theme.css (inlined into #tb-theme, after this CSS) can override any
+   of them: `:root { --primary: … }` applies to both modes, `[data-theme="light"] { … }` to one mode. */
+@import "@fontsource-variable/jetbrains-mono";
+@import "tailwindcss";
+@import "tw-animate-css";
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Dark (default): smui Polar Night hues/contrast, surfaces pushed toward black. */
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+  --radius: 0rem;
+  --background: hsl(216 14% 5.5%);
+  --foreground: hsl(213 27% 88%);
+  --card: hsl(216 13% 8%);
+  --card-foreground: hsl(213 27% 88%);
+  --popover: hsl(216 13% 9.5%);
+  --popover-foreground: hsl(213 27% 88%);
+  --primary: hsl(193 44% 67%);
+  --primary-foreground: hsl(216 14% 5.5%);
+  --secondary: hsl(216 12% 12.5%);
+  --secondary-foreground: hsl(213 27% 88%);
+  --muted: hsl(216 12% 12.5%);
+  --muted-foreground: hsl(213 13% 63%);
+  --accent: hsl(193 12% 12%);
+  --accent-foreground: hsl(193 44% 67%);
+  --destructive: hsl(355 52% 64%);
+  --destructive-foreground: hsl(219 28% 94%);
+  --border: hsl(216 12% 18%);
+  --input: hsl(216 12% 18%);
+  --ring: hsl(193 44% 67%);
+  --border-hover: hsl(216 11% 32%);
+  --chart-1: hsl(193 44% 67%);
+  --chart-2: hsl(213 32% 52%);
+  --chart-3: hsl(92 28% 65%);
+  --chart-4: hsl(40 71% 73%);
+  --chart-5: hsl(311 24% 63%);
+  --chart-6: hsl(14 51% 63%);
+  /* status (smui aurora) */
+  --success: hsl(92 28% 65%);
+  --warning: hsl(40 71% 73%);
+  --info: hsl(311 24% 63%);
+}
+
+/* Light: smui Snow Storm. */
+[data-theme="light"] {
+  color-scheme: light;
+  --background: hsl(218 27% 94%);
+  --foreground: hsl(220 16% 22%);
+  --card: hsl(218 27% 89%);
+  --card-foreground: hsl(220 16% 22%);
+  --popover: hsl(218 27% 89%);
+  --popover-foreground: hsl(220 16% 22%);
+  --primary: hsl(213 32% 40%);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(219 28% 84%);
+  --secondary-foreground: hsl(220 16% 22%);
+  --muted: hsl(219 28% 84%);
+  --muted-foreground: hsl(220 17% 28%);
+  --accent: hsl(213 20% 86%);
+  --accent-foreground: hsl(213 32% 40%);
+  --destructive: hsl(355 60% 45%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(219 18% 72%);
+  --input: hsl(219 18% 72%);
+  --ring: hsl(213 32% 40%);
+  --border-hover: hsl(220 17% 50%);
+  --chart-1: hsl(213 32% 44%);
+  --chart-2: hsl(193 40% 38%);
+  --chart-3: hsl(92 30% 36%);
+  --chart-4: hsl(40 70% 35%);
+  --chart-5: hsl(311 28% 42%);
+  --chart-6: hsl(14 55% 44%);
+  --success: hsl(92 35% 34%);
+  --warning: hsl(40 70% 34%);
+  --info: hsl(311 28% 40%);
+}
+
+/* TanStack Charts follow the tokens (the tooltip is appended to <body>, so its vars live on :root too). */
+:root {
+  --ts-chart-1: var(--chart-1);
+  --ts-chart-2: var(--chart-2);
+  --ts-chart-3: var(--chart-3);
+  --ts-chart-4: var(--chart-4);
+  --ts-chart-5: var(--chart-5);
+  --ts-chart-6: var(--chart-6);
+  --ts-chart-tooltip-background: var(--popover);
+  --ts-chart-tooltip-color: var(--popover-foreground);
+  --ts-chart-tooltip-border: 1px solid var(--border);
+  --ts-chart-tooltip-border-radius: var(--radius);
+  --ts-chart-tooltip-shadow: none;
+  --ts-chart-tooltip-font: 400 12px/1.4 "JetBrains Mono Variable", ui-monospace, monospace;
+  --ts-chart-crosshair-label-halo: var(--background);
+  --ts-chart-crosshair-marker-fill: var(--background);
+  --ts-chart-focus-fill: var(--background);
+}
+
+@theme inline {
+  --font-sans: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-border-hover: var(--border-hover);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--chart-6);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  /* smui: flat surfaces, no drop shadows on inline elements (overlays keep shadow-md/lg) */
+  --shadow-2xs: 0 0 #0000;
+  --shadow-xs: 0 0 #0000;
+  --shadow-sm: 0 0 #0000;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background text-foreground font-sans text-[13px] antialiased;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--primary) 22%, transparent);
+  }
+}
+
+.ts-chart {
+  color: var(--muted-foreground);
+}
+.ts-chart__grid line,
+.ts-chart__polar-grid path,
+.ts-chart__polar-grid line {
+  stroke: var(--border);
+}
+.ts-chart__axes text,
+.ts-chart__polar-grid text {
+  fill: var(--muted-foreground);
+  font-size: 12px;
+}
+
+/* ── notebook ── */
+/* prose tokens follow the theme (both modes) instead of typography's gray palette */
+.tb-prose {
+  --tw-prose-body: var(--foreground);
+  --tw-prose-headings: var(--foreground);
+  --tw-prose-lead: var(--muted-foreground);
+  --tw-prose-links: var(--primary);
+  --tw-prose-bold: var(--foreground);
+  --tw-prose-counters: var(--muted-foreground);
+  --tw-prose-bullets: var(--muted-foreground);
+  --tw-prose-hr: var(--border);
+  --tw-prose-quotes: var(--muted-foreground);
+  --tw-prose-quote-borders: var(--border);
+  --tw-prose-captions: var(--muted-foreground);
+  --tw-prose-code: var(--foreground);
+  --tw-prose-pre-code: var(--foreground);
+  --tw-prose-pre-bg: var(--muted);
+  --tw-prose-th-borders: var(--border);
+  --tw-prose-td-borders: var(--border);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.tb-prose > :first-child { margin-top: 0; }
+.tb-prose > :last-child { margin-bottom: 0; }
+.tb-ref {
+  color: var(--primary);
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+}
+.tb-ref:hover,
+.tb-ref:focus-visible {
+  text-decoration-style: solid;
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+}
+.tb-ref.tb-err {
+  color: var(--destructive);
+}

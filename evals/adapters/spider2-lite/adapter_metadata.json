@@ -1,0 +1,30 @@
+[
+  {
+    "adapter_name": "spider2-lite",
+    "adapter_builders": ["Rishav (rishav.21m@gmail.com)"],
+    "original_benchmark": [
+      {
+        "split": "lite",
+        "size": 547,
+        "harness": "agent",
+        "supported_agents": ["spider-agent"],
+        "adaptable": true,
+        "notes": "Spider2-lite @ xlang-ai/Spider2 cafb867313aab4e674652054198f383cf4018943: 547 tasks (135 local SQLite, rest BigQuery/Snowflake)."
+      }
+    ],
+    "harbor_adapter": [
+      {
+        "split": "lite-local",
+        "adapted_benchmark_size": 122,
+        "parity_benchmark_size": null,
+        "parity_sampling_rate": null,
+        "registry_benchmark_size": null,
+        "added_agents": [],
+        "parity_matching_agents": [],
+        "parity_unmatching_agents": null,
+        "parity_costs": null,
+        "notes": "Local SQLite tasks without external_knowledge only (135 local - 13 with external_knowledge = 122). Parity not run yet; not registered. Oracle verified on local329."
+      }
+    ]
+  }
+]

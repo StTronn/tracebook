@@ -1,0 +1,103 @@
+{
+  "chart": {
+    "bar": {
+      "summary": "Compare values across categories. Several y columns draw grouped bars.",
+      "y": "1+",
+      "variants": {
+        "default": "vertical bars (grouped when y has several columns)",
+        "stacked": "y columns stacked into one bar per x",
+        "horizontal": "horizontal bars; best for long labels or rankings",
+        "label": "vertical bars with the value printed above each bar (one y column)"
+      },
+      "example": "{ type: bar, data: methods, x: method, y: [payments, succeeded] }"
+    },
+    "line": {
+      "summary": "A trend over an ordered x (dates, weeks, steps).",
+      "y": "1+",
+      "variants": {
+        "default": "smooth line",
+        "dots": "smooth line with a dot on every point",
+        "linear": "straight segments",
+        "step": "step line, for values that change in jumps",
+        "label": "line with the value printed at every point (one y column)"
+      },
+      "example": "{ type: line, data: weekly, x: week, y: conversion, format: pct }"
+    },
+    "area": {
+      "summary": "A trend whose magnitude matters; stacked shows composition over time.",
+      "y": "1+",
+      "variants": {
+        "default": "filled smooth area (stacked when y has several columns)",
+        "gradient": "area with a fading gradient fill",
+        "stacked": "y columns stacked",
+        "expanded": "y columns stacked and normalised to 100% at every x (needs 2+ y columns)",
+        "linear": "straight segments",
+        "step": "step area"
+      },
+      "example": "{ type: area, data: weekly, x: week, y: [paid, orders], variant: gradient }"
+    },
+    "pie": {
+      "summary": "Share of a whole across a few categories (use bar for more than ~6).",
+      "y": "1",
+      "variants": {
+        "pie": "full pie",
+        "donut": "ring",
+        "donut-text": "ring with the total in the centre",
+        "label": "pie with values printed on the slices"
+      },
+      "example": "{ type: pie, data: methods, x: method, y: payments, variant: donut-text }"
+    },
+    "funnel": {
+      "summary": "Ordered stages that drop off; prints each stage's value and its share of the first stage.",
+      "y": "1",
+      "variants": {
+        "default": "horizontal stage bars in data order"
+      },
+      "example": "{ type: funnel, data: funnel_stages, x: stage, y: n }"
+    },
+    "radial": {
+      "summary": "One value against a maximum (progress, rate, attainment). Data must have exactly 1 row.",
+      "y": "1",
+      "variants": {
+        "default": "progress ring",
+        "text": "progress ring with the value in the centre"
+      },
+      "options": {
+        "max": "number or block.column; default 1 (so pct values fill the ring)"
+      },
+      "example": "{ type: radial, data: funnel, y: conv_paid, format: pct, variant: text }"
+    },
+    "combo": {
+      "summary": "Several series with different marks on one shared y axis and format (e.g. actual dots + predicted line + interval band). Mixed units belong in two charts.",
+      "y": "1+",
+      "marks": [
+        "bar",
+        "line",
+        "dot",
+        "area",
+        "band"
+      ],
+      "variants": {
+        "default": "each y item drawn with its own mark"
+      },
+      "example": "{ type: combo, data: weekly, x: week, y: [{col: orders, mark: bar}, {col: paid, mark: line, label: Paid}, {col: [low, high], mark: band}] }"
+    }
+  },
+  "aliases": {
+    "hbar": [
+      "bar",
+      "horizontal"
+    ]
+  },
+  "fields": {
+    "type": "one of the chart types above",
+    "data": "id of a sql/python/sheet block",
+    "x": "category / label column (not used by radial)",
+    "y": "value column, or a list of value columns (series); combo: list of {col, mark, label?}, band col is [low, high]",
+    "variant": "optional; first variant listed is the default",
+    "format": "optional value format: int num pct inr inr_short usd",
+    "zero": "optional; line/combo y axis starts at 0 (default true); false fits the axis to the data",
+    "title": "optional card title",
+    "description": "optional card subtitle"
+  }
+}

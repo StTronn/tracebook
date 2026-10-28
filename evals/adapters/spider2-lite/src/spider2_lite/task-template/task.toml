@@ -1,0 +1,26 @@
+schema_version = "1.4"
+
+[task]
+name = "spider2-lite/${instance_id}"
+description = "Spider2-lite ${instance_id} (local SQLite db `${db}`), source xlang-ai/Spider2@${commit}"
+keywords = ["spider2-lite", "sql", "data-analysis"]
+
+[metadata]
+source = "https://github.com/xlang-ai/Spider2/tree/${commit}/spider2-lite"
+db = "${db}"
+ignore_order = ${ignore_order}
+condition_cols = ${condition_cols}
+
+[environment]
+build_timeout_sec = 600.0
+cpus = 1
+memory_mb = 4096
+
+[agent]
+timeout_sec = 1200.0
+# No network allowlist: Docker Desktop's kernel lacks CONFIG_NFT_FIB_INET, so Harbor can't enforce one locally.
+# Instead: job configs pass disable_web_search=true, and evals/results flags trajectories with network commands
+# (possible lookup of Spider2's public gold files). Switch to network_mode = "allowlist" on a Linux/remote sandbox.
+
+[verifier]
+timeout_sec = 120.0

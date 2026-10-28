@@ -1,0 +1,24 @@
+# Setup CC+P+T: CC+P + tracebook CLI, its skill and a project CLAUDE.md asking for a notebook. Only agents[].skills and the tracebook mounts may differ across cc*.yaml.
+#   evals/run.sh evals/configs/cc-p-t.yaml      (key in evals/.env; add --install-only to test setup without model calls)
+job_name: cc-p-t-local329
+jobs_dir: evals/jobs
+n_attempts: 3
+n_concurrent_trials: 3
+artifacts: [/app]          # answer.csv + any notebook/workspace the agent leaves behind (inspection, judges)
+tasks:
+  - path: evals/tasks/spider2-lite/local329
+environment:
+  mounts:                  # host runtimes (evals/agents/prefetch.py, run by evals/run.sh), read-only; nothing installed per trial
+    - {type: bind, source: "${EVALS_RT}/claude", target: /usr/local/bin/claude, read_only: true, bind: {create_host_path: false}}
+    - {type: bind, source: "${EVALS_RT}/tracebook", target: /opt/tracebook, read_only: true, bind: {create_host_path: false}}
+    - {type: bind, source: "${EVALS_DIR}/agents/tracebook.sh", target: /usr/local/bin/tracebook, read_only: true, bind: {create_host_path: false}}
+    - {type: bind, source: "${EVALS_DIR}/../src/tracebook/skill", target: /root/.claude/skills/tracebook, read_only: true, bind: {create_host_path: false}}
+    - {type: bind, source: "${EVALS_DIR}/agents/CLAUDE.md", target: /app/CLAUDE.md, read_only: true, bind: {create_host_path: false}}
+agents:
+  - name: claude-code      # Harbor built-in; skips install since the mounted binary matches `version`
+    model_name: anthropic/claude-haiku-4-5
+    kwargs:
+      version: "2.1.312"         # pinned Claude Code (prefetch mounts this build)
+      disable_web_search: true   # no WebSearch/WebFetch (Docker Desktop can't enforce a network allowlist)
+    skills:
+      - src/tracebook/packs/generic/data-analysis   # copied into Claude Code's skills/ in the sandbox
