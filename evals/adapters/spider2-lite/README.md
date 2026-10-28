@@ -15,6 +15,8 @@ image. Task name `spider2-lite/<id>`. Dockerfile is agent-neutral (python3, pand
 ```bash
 evals/adapters/spider2-lite/fetch.sh cafb867313aab4e674652054198f383cf4018943 local329   # → evals/.cache/spider2
 uv run --project evals/adapters/spider2-lite python -m spider2_lite.main --task-ids local329 --overwrite
+# bundle (adapter.BUNDLES): several same-db questions as one request, graded per question → reward.json
+uv run --project evals/adapters/spider2-lite python -m spider2_lite.main --bundle log-web-funnel --overwrite
 ```
 Flags: `--output-dir` (default `evals/tasks/spider2-lite`), `--task-ids`, `--limit`, `--overwrite`. No `--task-ids` →
 all 122 eligible ids (fetch them first).

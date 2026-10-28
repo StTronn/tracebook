@@ -1,0 +1,23 @@
+schema_version = "1.4"
+
+[task]
+name = "spider2-lite/${name}"
+description = "Spider2-lite bundle ${name}: ${ids} on local SQLite db `${db}` asked as one request, source xlang-ai/Spider2@${commit}"
+keywords = ["spider2-lite", "sql", "data-analysis", "bundle"]
+
+[metadata]
+source = "https://github.com/xlang-ai/Spider2/tree/${commit}/spider2-lite"
+db = "${db}"
+instance_ids = ${ids_json}
+
+[environment]
+build_timeout_sec = 600.0
+cpus = 1
+memory_mb = 4096
+
+[agent]
+timeout_sec = 1800.0
+# No network allowlist (Docker Desktop lacks CONFIG_NFT_FIB_INET); see task-template/task.toml.
+
+[verifier]
+timeout_sec = 180.0

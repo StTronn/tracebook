@@ -35,9 +35,18 @@ Never claim the report is done until `tracebook check` prints `✓ … 0 error(s
 
 ## Notebook shape
 
-Open with a title, the question, and the answer in a sentence with `{{block.col}}` refs; add a line on where the data
-comes from when it isn't obvious. Keep it short. The block you export returns exactly what was asked (a count → one
-row with the count).
+The notebook is the presentable result, like a dashboard or report in Power BI, Sheets or Hex, that someone opens to
+see the answers.
+
+- Lay it out like a notebook: `# Title`, one line on what it answers, then one `##` heading per question in the order asked.
+- Under each heading, lead with the answer: a `kpi` card for the headline number (with `compare` when one exists), then
+  one or two plain sentences stating the takeaway with `{{block.col}}` refs.
+- Add a `chart` only when shape or trend matters, and a `table` only when the reader needs the rows; skip both if the
+  card already answers it.
+- Keep sql/python blocks next to the output they feed; they support the story, so don't narrate code in prose.
+- Put definitions, assumptions and data-source notes in a short closing `## Notes` section, never at the top.
+- Explain simply: everyday words, units on every number.
+- A block exported as an answer file returns exactly what was asked (a count → one row with the count).
 
 ## Blocks
 

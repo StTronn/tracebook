@@ -93,3 +93,45 @@ def test_adapter_refuses_cloud_and_unknown_tasks(tmp_path, cache):
         adapter.make_task("bq001", tmp_path, cache)
     with pytest.raises(SystemExit, match="not in spider2-lite"):
         adapter.make_task("local999", tmp_path, cache)
+
+
+def test_bundle_builds_one_gradable_multi_question_task(tmp_path, cache):
+    rows = [{"instance_id": "local901", "db": "toy", "question": "How many rows?", "external_knowledge": None},
+            {"instance_id": "local902", "db": "toy", "question": "Max x?", "external_knowledge": None},
+            {"instance_id": "local903", "db": "other", "question": "x", "external_knowledge": None}]
+    (cache / "spider2-lite.jsonl").write_text("\n".join(map(json.dumps, rows)) + "\n")
+    _csv(cache / "gold" / "local902.csv", "m\n2\n")
+    _csv(cache / "gold" / "local903.csv", "m\n2\n")
+    (cache / "localdb" / "other.sqlite").write_bytes(b"")
+    bundles = {"toy-pair": {"ids": ["local901", "local902"], "intro": "toy data. Answer:"},
+               "mixed": {"ids": ["local901", "local903"], "intro": "x"}}
+    d = adapter.make_bundle("toy-pair", tmp_path / "out", cache, bundles)
+    instr = (d / "instruction.md").read_text()
+    assert "1. How many rows?" in instr and "2. Max x?" in instr and "`/app/answers/q2.csv`" in instr
+    assert "local90" not in instr                                            # no Spider2 ids leak to the agent
+    assert not list((d / "environment").rglob("*.csv"))
+    assert json.loads((d / "tests" / "bundle.json").read_text()) == {"questions": {"q1": "local901", "q2": "local902"}}
+    assert "${" not in "".join(p.read_text() for p in d.rglob("*") if p.suffix in (".md", ".toml", ".sh", ".py"))
+
+    def grade(answers: dict[str, str]) -> dict:                             # run grade.py with /tests,/app,/logs remapped
+        app, logs = tmp_path / "app" / "answers", tmp_path / "logs" / "verifier"
+        for p in (app, logs):
+            p.mkdir(parents=True, exist_ok=True)
+            for f in p.glob("*"):
+                f.unlink()
+        for q, text in answers.items():
+            _csv(app / f"{q}.csv", text)
+        src = (d / "tests" / "grade.py").read_text().replace('"/tests"', repr(str(d / "tests"))) \
+            .replace('Path("/tests")', f"Path({str(d / 'tests')!r})").replace("/app/answers", str(app)) \
+            .replace("/logs/verifier", str(logs))
+        subprocess.run([sys.executable, "-c", src], check=True, capture_output=True)
+        return json.loads((logs / "reward.json").read_text())
+
+    oracle = {q: (d / "solution" / "answers" / f"{q}.csv").read_text() for q in ("q1", "q2")}
+    assert grade(oracle) == {"q1": 1, "q2": 1, "reward": 1.0}
+    assert grade({"q1": oracle["q1"], "q2": "m\n9\n"}) == {"q1": 1, "q2": 0, "reward": 0.5}
+    assert grade({"q2": oracle["q2"]}) == {"q1": 0, "q2": 1, "reward": 0.5}   # missing file → 0 for that question only
+    with pytest.raises(SystemExit, match="share one db"):
+        adapter.make_bundle("mixed", tmp_path / "out", cache, bundles)
+    with pytest.raises(SystemExit, match="unknown bundle"):
+        adapter.make_bundle("nope", tmp_path / "out", cache, bundles)

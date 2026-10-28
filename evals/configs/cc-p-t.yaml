@@ -1,12 +1,13 @@
 # Setup CC+P+T: CC+P + tracebook CLI, its skill and a project CLAUDE.md asking for a notebook. Only agents[].skills and the tracebook mounts may differ across cc*.yaml.
 #   evals/run.sh evals/configs/cc-p-t.yaml      (key in evals/.env; add --install-only to test setup without model calls)
-job_name: cc-p-t-local329
+job_name: cc-p-t
 jobs_dir: evals/jobs
 n_attempts: 3
 n_concurrent_trials: 3
 artifacts: [/app]          # answer.csv + any notebook/workspace the agent leaves behind (inspection, judges)
 tasks:
   - path: evals/tasks/spider2-lite/local329
+  - path: evals/tasks/spider2-lite/log-web-funnel   # local329+330+331+360 as one request
 environment:
   mounts:                  # host runtimes (evals/agents/prefetch.py, run by evals/run.sh), read-only; nothing installed per trial
     - {type: bind, source: "${EVALS_RT}/claude", target: /usr/local/bin/claude, read_only: true, bind: {create_host_path: false}}
