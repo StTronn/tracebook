@@ -1,5 +1,8 @@
 # Data agent: pack + evals plan (working notes)
 
+> Naming: the data-analysis "pack" below is now the **playbook** (`playbooks/data-analysis`, independent of Tracebook); "packs" inside Tracebook are only source packs (e.g. Razorpay import detection).
+
+
 Status: planning, nothing below is built yet. Decisions marked ✅, open items marked ❓. Current tracer-bullet plan: `plan.md`.
 
 ## 1. Framing

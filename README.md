@@ -32,7 +32,7 @@ The agent normally runs all of these commands itself; the full workflow it follo
 
 ## Evaluation
 The aim is to measure, on benchmark tasks we did not write, whether each layer actually helps:
-- **Pack** (`src/tracebook/packs/generic/data-analysis`): a generic data-analysis skill (look at the data first, state the definition, check row counts, verify). Should make answers more correct.
+- **Playbook** (`playbooks/data-analysis`): a generic data-analysis skill (look at the data first, state the definition, check row counts, verify), independent of Tracebook. Should make answers more correct.
 - **Tracebook**: the CLI and its skill. Should keep the answer just as correct and also leave a notebook behind that can be checked, reviewed and rerun.
 
 ### How it runs
@@ -42,8 +42,8 @@ The aim is to measure, on benchmark tasks we did not write, whether each layer a
   | Setup | What the agent gets |
   |---|---|
   | **CC** | plain Claude Code |
-  | **CC+P** | Claude Code + the pack skill |
-  | **CC+P+T** | Claude Code + the pack skill + the tracebook CLI, its skill, and a `CLAUDE.md` asking for a notebook |
+  | **CC+P** | Claude Code + the playbook skill |
+  | **CC+P+T** | Claude Code + the playbook skill + the tracebook CLI, its skill, and a `CLAUDE.md` asking for a notebook |
 
 - **Rules:** the grader is never changed to make a run pass. Every task is first checked with the oracle (must score 1) and with an agent that does nothing (must score 0). Each setup gets 3 attempts per task. Only one thing changes between runs, and each change is logged with its hypothesis and result.
 - **What gets measured:**
@@ -51,7 +51,7 @@ The aim is to measure, on benchmark tasks we did not write, whether each layer a
   - **B, process** (planned): cost, turns, and whether the final answer came from a notebook block or from a side script.
   - **C, trust** (planned): planted faults caught by `check`, numbers a reviewer can trace, review comments fixed, correct reruns on new data.
 
-### Tasks
+### Tasks (dataset `evals/datasets/data-agent`: correct answers; a notebook-quality dataset comes later)
 Both come from [Spider2-lite](https://github.com/xlang-ai/Spider2), a public text-to-SQL benchmark, and use the same SQLite database: a website's logs (19 tables, e.g. `activity_log`, `form_log`, `access_log`). The agent writes its answers as CSV files, and Spider2's own comparison grades them against the gold results.
 
 | Task | What it asks | Answer |
@@ -89,7 +89,8 @@ harbor view evals/jobs                                                # browse r
 ## Repository layout
 | Path | What |
 |---|---|
-| `src/tracebook/` | CLI, runtime (import, blocks, `check`), packs, agent skill, built viewer |
+| `src/tracebook/` | CLI, runtime (import, blocks, `check`), source packs (e.g. Razorpay), agent skill, built viewer |
+| `playbooks/` | Claude Code skills with data-analysis know-how, independent of Tracebook (`data-analysis`) |
 | `web/` | viewer source (React + Vite); `npm run build` writes `src/tracebook/viewer/` |
 | `tests/` | `uv run pytest` |
 | `evals/` | Harbor adapter for Spider2-lite, setup configs, runner |

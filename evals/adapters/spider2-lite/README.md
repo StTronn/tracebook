@@ -18,7 +18,7 @@ uv run --project evals/adapters/spider2-lite python -m spider2_lite.main --task-
 # bundle (adapter.BUNDLES): several same-db questions as one request, graded per question → reward.json
 uv run --project evals/adapters/spider2-lite python -m spider2_lite.main --bundle log-web-funnel --overwrite
 ```
-Flags: `--output-dir` (default `evals/tasks/spider2-lite`), `--task-ids`, `--limit`, `--overwrite`. No `--task-ids` →
+Flags: `--output-dir` (default `evals/datasets/data-agent`), `--task-ids`, `--limit`, `--overwrite`. No `--task-ids` →
 all 122 eligible ids (fetch them first).
 
 ## Run Evaluation / Harness

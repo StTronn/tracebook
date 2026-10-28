@@ -9,7 +9,7 @@ from .adapter import BUNDLES, EVALS, Spider2LiteAdapter, make_bundle
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--output-dir", type=Path, default=EVALS / "tasks" / "spider2-lite")
+    ap.add_argument("--output-dir", type=Path, default=EVALS / "datasets" / "data-agent")
     ap.add_argument("--limit", type=int, default=None, help="generate only the first N tasks")
     ap.add_argument("--overwrite", action="store_true", help="overwrite existing task dirs (else skipped)")
     ap.add_argument("--task-ids", nargs="+", default=None)

@@ -17,4 +17,4 @@ agents:
   # - name: claude-code
   #   model_name: anthropic/claude-haiku-4-5
 datasets:
-  - path: evals/tasks/spider2-lite
+  - path: evals/datasets/data-agent

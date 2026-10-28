@@ -1,6 +1,6 @@
-# downloaded benchmark sources (Spider2 repo files, local SQLite zip), generated Harbor tasks, Harbor job output
+# downloaded benchmark sources (Spider2 repo files, local SQLite zip), generated Harbor datasets, Harbor job output
 .cache/
-tasks/
+datasets/
 jobs/
 
 # local secrets for harbor --env-file (ANTHROPIC_API_KEY=...)

@@ -6,8 +6,8 @@ n_attempts: 3
 n_concurrent_trials: 3
 artifacts: [/app]          # answer.csv + any notebook/workspace the agent leaves behind (inspection, judges)
 tasks:
-  - path: evals/tasks/spider2-lite/local329
-  - path: evals/tasks/spider2-lite/log-web-funnel   # local329+330+331+360 as one request
+  - path: evals/datasets/data-agent/local329
+  - path: evals/datasets/data-agent/log-web-funnel   # local329+330+331+360 as one request
 environment:
   mounts:                  # host runtimes (evals/agents/prefetch.py, run by evals/run.sh), read-only; nothing installed per trial
     - {type: bind, source: "${EVALS_RT}/claude", target: /usr/local/bin/claude, read_only: true, bind: {create_host_path: false}}
@@ -22,4 +22,4 @@ agents:
       version: "2.1.312"         # pinned Claude Code (prefetch mounts this build)
       disable_web_search: true   # no WebSearch/WebFetch (Docker Desktop can't enforce a network allowlist)
     skills:
-      - src/tracebook/packs/generic/data-analysis   # copied into Claude Code's skills/ in the sandbox
+      - playbooks/data-analysis   # playbook skill, copied into Claude Code's skills/ in the sandbox

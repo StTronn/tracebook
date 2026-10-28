@@ -4,18 +4,18 @@ One thin path through every layer on **one task** (Spider2-lite `local329`), mea
 
 ## 1. Outcome
 A user asks a data question about their own data in Claude Code and gets:
-1. a **correct** answer (the pack's job),
+1. a **correct** answer (the playbook's job),
 2. a **Tracebook notebook** that shows how it was computed, which they can check, comment on, and rerun (Tracebook's job).
 
 Claim to prove, on externally defined tasks with an untouched grader:
-- **Pack:** CC+P ≥ CC on correctness, at a similar cost.
+- **Playbook:** CC+P ≥ CC on correctness, at a similar cost.
 - **Tracebook:** CC+P+T matches CC+P on correctness, and only CC+P+T produces answers that are traceable, catch faults, survive review, and rerun on new data.
 
 ## 2. The shape
 ```
 task (fixed)          setup (only thing that varies)        Harbor trial                  graders                 results
 instruction.md   ──▶  CC      plain Claude Code        ──▶  docker, 3 attempts      ──▶  A correct (Spider2)  ──▶  evals.md (notebook)
-data + gold           CC+P    + pack skill                  answer.csv + /app           B process (trajectory)    log.md (one change → result)
+data + gold           CC+P    + playbook skill              answer.csv + /app           B process (trajectory)    log.md (one change → result)
 tests/ (hidden)       CC+P+T  + tracebook CLI/skill         trajectory (ATIF), cost     C trust (variants)
 ```
 Validity on every task: oracle = 1, nop = 0; infra errors are rerun; timeouts count as 0.
@@ -23,7 +23,7 @@ Validity on every task: oracle = 1, nop = 0; infra errors are rerun; timeouts co
 ## 3. User journey → what proves each step
 | # | User journey step | Product piece | Eval that proves it | Kind |
 |---|---|---|---|---|
-| 1 | Asks a question over their data in Claude Code | model + pack | Spider2 grader: reward 0/1, pass@1, pass^3; cost, turns | A, B |
+| 1 | Asks a question over their data in Claude Code | model + playbook | Spider2 grader: reward 0/1, pass@1, pass^3; cost, turns | A, B |
 | 2 | Agent works *inside* a notebook: schema → SQL blocks → `check` → answer from a block | Tracebook runtime | `answer_from_block` ≥ 90 %, `side_script` ≤ 10 %, check-fail-then-fix | B |
 | 3 | Data has a trap (duplicate join, wrong type) | `check` rules | C1 fault variant of the task: caught + fixed; no-fault control has no false alarms | C1 |
 | 4 | Opens the viewer, clicks a number → sees its query | artifact | C4 judge sees only the artifact, must find the source of each number and a planted wrong one | C4 |
@@ -48,6 +48,6 @@ Steps 1–2 hold for any benchmark task; steps 3–6 are variants built from the
 
 ## 5. Rules
 - Same task for every setup; only `skills:` and tracebook mounts differ between `evals/configs/cc*.yaml`.
-- One change per run (pack, Tracebook or eval, never two); new job name; the grader is never edited to pass a run (grader bug → fix the test + `harbor job regrade`).
-- Contamination: the pack carries definitions, never copied package models; contaminated tasks reported separately.
+- One change per run (playbook, Tracebook or eval, never two); new job name; the grader is never edited to pass a run (grader bug → fix the test + `harbor job regrade`).
+- Contamination: the playbook carries definitions, never copied package models; contaminated tasks reported separately.
 - Limits: one task is a demo, not evidence; ~37 tasks detect only ≥ 10–15 point gaps; benchmarks don't measure real-user value.

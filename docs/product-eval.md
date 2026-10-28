@@ -1,5 +1,8 @@
 # Tracebook — product & evaluation plan
 
+> Naming: the data-analysis "pack" below is now the **playbook** (`playbooks/data-analysis`, independent of Tracebook); "packs" inside Tracebook are only source packs (e.g. Razorpay import detection).
+
+
 Tracebook turns business data (billing, customers, browsing events) into **analysis notebooks your own coding agent builds and you can check**. Every number in a report traces to the block/query that produced it; the agent is scored on public benchmarks and gets measurably better per version. Benchmarks are evidence, not the product.
 
 ## 1. Users & questions
