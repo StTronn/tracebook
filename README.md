@@ -2,6 +2,8 @@
 
 Agent-native data notebook. An agent (Claude Code) answers data questions in a notebook of SQL / Python / `.xlsx`-model blocks over your files (CSV, Excel, JSON, SQLite, Parquet → DuckDB). Every number traces to the block that computed it; the user reviews it in a viewer, comments, and reruns on new data.
 
+Demo (24 s): [docs/tracebook_demo.mp4](docs/tracebook_demo.mp4)
+
 ## Install
 ```bash
 uv tool install .            # tracebook CLI
