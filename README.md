@@ -51,33 +51,36 @@ The aim is to measure, on benchmark tasks we did not write, whether each layer a
   - **B, process** (planned): cost, turns, and whether the final answer came from a notebook block or from a side script.
   - **C, trust** (planned): planted faults caught by `check`, numbers a reviewer can trace, review comments fixed, correct reruns on new data.
 
-### The first task: Spider2-lite `local329`
-From [Spider2-lite](https://github.com/xlang-ai/Spider2), a public text-to-SQL benchmark. The agent gets a SQLite web-activity log with 19 tables and this question:
+### Tasks
+Both come from [Spider2-lite](https://github.com/xlang-ai/Spider2), a public text-to-SQL benchmark, and use the same SQLite database: a website's logs (19 tables, e.g. `activity_log`, `form_log`, `access_log`). The agent writes its answers as CSV files, and Spider2's own comparison grades them against the gold results.
 
-> How many unique sessions visited the /regist/input page and then the /regist/confirm page, in that order?
+| Task | What it asks | Answer |
+|---|---|---|
+| `local329` | How many unique sessions visited `/regist/input` and then `/regist/confirm`, in that order? | one count (gold: 1, from `form_log`) |
+| `log-web-funnel` | The four funnel questions of the same database in one request, as an analyst would ask them: **Q1** = `local329`; **Q2** sessions per page as landing or exit page; **Q3** the three most common pages right after two consecutive `/detail` visits; **Q4** sessions with the fewest search events before the first `/detail` click or `/complete` (Spider2 `local329`, `local330`, `local331`, `local360`) | four tables, each graded on its own; the task score is the share correct |
 
-It must write the result as a CSV to `/app/answer.csv`. The grader is Spider2's own result comparison, against the gold answer **1**. The trap: the page visits for the registration form live in `form_log`, one of many similar log tables, and the order of the visits matters.
+### Results (Claude Haiku 4.5, Claude Code 2.1.312, 3 attempts per task and setup)
+| Setup | `local329` | Funnel Q1 | Q2 | Q3 | Q4 | Funnel average | Cost (both tasks, 6 attempts) |
+|---|---|---|---|---|---|---|---|
+| **CC** | 3/3 | 1/3 | 3/3 | 0/3 | 0/3 | 33 % | $0.51 |
+| **CC+P** | 2/3 | 2/3 | 0/3 | 0/3 | 0/3 | 17 % | $0.67 |
+| **CC+P+T** | 3/3 | 0/3 | 2/3 | 0/3 | 0/3 | 17 % | $0.76 |
 
-### Results so far (Claude Haiku 4.5, Claude Code 2.1.312, 3 attempts per setup)
-| Setup | Correct | Cost per attempt | Time per attempt | Notes |
-|---|---|---|---|---|
-| **CC** | 2 / 3 | $0.02–0.06 | 17–38 s | The miss never looked at `form_log` and answered from the wrong table. |
-| **CC+P** | 3 / 3 | $0.04–0.05 | 33–40 s | First version: the skill was never loaded (also 2/3). After its description said to load it before any query, it was loaded in 3/3 and all were correct. |
-| **CC+P+T** | 3 / 3 | $0.05–0.07 | 33–48 s | Correct every time, but a notebook was written in only 1 of 3 attempts: Tracebook is not yet steering the work. (Run before the setup change that moved `CLAUDE.md` into `/app`; to be re-run.) |
-
-What this shows so far:
-1. The pack fixed the one failure, at about 1.25× the total cost ($0.14 vs $0.11 for 3 attempts).
-2. Tracebook did not hurt correctness, but it isn't yet the place where the work happens. The next step is for the answer to come from a notebook block (`tracebook export --block`), measured with B.
-3. One task is a working end-to-end example, not evidence. Next steps: the four local web-funnel tasks, then MRR (Spider2-DBT) and customer-360 slices, and DABStep for scale.
-
-The full plan is in [`plan.md`](plan.md); background and decisions are in [`data-agent.md`](data-agent.md).
+- **No setup is clearly better yet.** With 3 attempts, a difference of one attempt is noise.
+- **Every CC+P+T attempt built a notebook** (6/6, all passing `tracebook check`, one section per question).
+- **Why the funnel fails:**
+  - **Q1:** Q2 and Q4 say "using the activity log table", and agents carry that over to Q1, counting `/input → /confirm` in `activity_log` instead of `/regist/...` in `form_log`. In the notebooks the wrong `FROM activity_log` is visible at a glance.
+  - **Q3 and Q4:** every attempt read them differently from Spider2's gold (Q3: 33 `/detail` visits counted against 55 in the gold; Q4: sessions with at least one search event returned instead of those with none). Both look under-specified in the benchmark itself.
+- **A Tracebook gap found:** two notebooks quoted a number by row position (`{{q2_landing_exit[2].unique_sessions}}`) from a multi-row table, so the sentence named one page but showed another page's count, and `check` passed it. Next: `check` warns on row-indexed references into multi-row blocks.
+- **Earlier runs** (old setup, `local329` only): CC 2/3, CC+P 3/3 after its skill description was fixed (2/3 before, when the skill was never loaded), CC+P+T 3/3 but a notebook in only 1/3.
 
 ### Running the evals
 ```bash
-evals/adapters/spider2-lite/fetch.sh cafb867313aa local329           # Spider2 files + database (one-time download)
+evals/adapters/spider2-lite/fetch.sh cafb867313aa local329 local330 local331 local360   # Spider2 files + database (one-time download)
 uv run --project evals/adapters/spider2-lite python -m spider2_lite.main --task-ids local329
+uv run --project evals/adapters/spider2-lite python -m spider2_lite.main --bundle log-web-funnel
 echo 'ANTHROPIC_API_KEY=...' > evals/.env                             # or CLAUDE_CODE_OAUTH_TOKEN (from `claude setup-token`)
-evals/run.sh evals/configs/cc.yaml                                    # also cc-p.yaml, cc-p-t.yaml
+evals/run.sh evals/configs/cc.yaml                                    # runs both tasks; also cc-p.yaml, cc-p-t.yaml
 evals/run.sh evals/configs/cc.yaml --install-only                     # check setup only, no model calls
 harbor view evals/jobs                                                # browse runs and trajectories
 ```
