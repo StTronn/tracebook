@@ -79,15 +79,15 @@ FROM monthly
 ```
 
 ```kpi
-- { label: "Net sales, Dec 2010–Nov 2011 (£)", value: yearly.net_sales_y2, format: num, compare: yearly.net_sales_y1 }
+- { label: "Net sales, Dec 2010–Nov 2011", value: yearly.net_sales_y2, format: gbp_short, compare: yearly.net_sales_y1 }
 - { label: "Orders, Dec 2010–Nov 2011", value: yearly.orders_y2, format: int, compare: yearly.orders_y1 }
-- { label: "Average order value (£)", value: yearly.aov_y2, format: num, compare: yearly.aov_y1 }
+- { label: "Average order value", value: yearly.aov_y2, format: gbp, compare: yearly.aov_y1 }
 ```
 
-Over the last 12 full months net sales were **£{{yearly.net_sales_y2 | num}}**, a change of **{{yearly.sales_growth | pct}}** on the 12 months before, while orders changed by **{{yearly.orders_growth | pct}}** — so the business is roughly flat year on year. The pattern is strongly seasonal: sales climb from September and peak in November (best month: **{{peak.month | text}}**, £{{peak.net_sales | num}}); Sep–Nov brings **{{q4_share.autumn_share | pct}}** of the year's sales. December 2011 only covers the 1st–9th, so its dip is not a real drop.
+Over the last 12 full months net sales were **{{yearly.net_sales_y2 | gbp_short}}**, a change of **{{yearly.sales_growth | pct}}** on the 12 months before, while orders changed by **{{yearly.orders_growth | pct}}** — so the business is roughly flat year on year. The pattern is strongly seasonal: sales climb from September and peak in November (best month: **{{peak.month | text}}**, {{peak.net_sales | gbp_short}}); Sep–Nov brings **{{q4_share.autumn_share | pct}}** of the year's sales. December 2011 only covers the 1st–9th, so its dip is not a real drop.
 
 ```chart
-{ type: combo, data: monthly, x: month, y: [{col: net_sales, mark: bar, label: "Net sales (£)"}, {col: gross_sales, mark: line, label: "Gross sales (£)"}], format: num, title: "Monthly sales (£)", description: "Gross = all product sales; net = after cancellations and returns. Dec 2011 is a partial month." }
+{ type: combo, data: monthly, x: month, y: [{col: net_sales, mark: bar, label: "Net sales (£)"}, {col: gross_sales, mark: line, label: "Gross sales (£)"}], format: gbp_short, title: "Monthly sales (£)", description: "Gross = all product sales; net = after cancellations and returns. Dec 2011 is a partial month." }
 ```
 
 ```chart
@@ -136,7 +136,7 @@ FROM (SELECT *, row_number() OVER (ORDER BY net_sales DESC) AS rn FROM countries
 The UK brings in **{{uk.uk_share | pct}}** of net sales. The rest is spread over {{uk.n_countries | int}} countries, led by **{{uk.second_country | text}}** (Ireland) at only {{uk.second_share | pct}} — almost all from a handful of large trade accounts — then the Netherlands, Germany and France.
 
 ```chart
-{ type: bar, data: top_countries, x: country, y: net_sales, variant: horizontal, format: num, title: "Net sales by country (£)" }
+{ type: bar, data: top_countries, x: country, y: net_sales, variant: horizontal, format: gbp_short, title: "Net sales by country (£)" }
 ```
 
 ```sql products "Net sales by product"
@@ -174,10 +174,10 @@ FROM r
 - { label: "Top 100 products' share", value: product_concentration.top100_share, format: pct }
 ```
 
-Product sales are spread wide: the top 10 of {{product_concentration.n_products | int}} products make up just **{{product_concentration.top10_share | pct}}** of net sales, and it takes **{{product_concentration.products_for_half | int}}** products to reach half. The biggest seller is **{{product_concentration.top_product | text}}** (£{{product_concentration.top_product_sales | num}}). Products are ranked on net sales, so orders that were placed and then cancelled (such as the {{bulk.q1 | int}}-unit "{{bulk.d1 | text}}" order) do not inflate the list.
+Product sales are spread wide: the top 10 of {{product_concentration.n_products | int}} products make up just **{{product_concentration.top10_share | pct}}** of net sales, and it takes **{{product_concentration.products_for_half | int}}** products to reach half. The biggest seller is **{{product_concentration.top_product | text}}** ({{product_concentration.top_product_sales | gbp_short}}). Products are ranked on net sales, so orders that were placed and then cancelled (such as the {{bulk.q1 | int}}-unit "{{bulk.d1 | text}}" order) do not inflate the list.
 
 ```table
-{ data: products, columns: [stockcode, description, net_sales, net_units, orders, share], limit: 15, format: { net_sales: num, net_units: int, orders: int, share: pct } }
+{ data: products, columns: [stockcode, description, net_sales, net_units, orders, share], limit: 15, format: { net_sales: gbp, net_units: int, orders: int, share: pct } }
 ```
 
 ## 3. How many customers come back?
@@ -356,7 +356,26 @@ FROM ranked
 ```
 
 ```table
-{ data: rfm_segments, columns: [segment, customers, share_customers, net_spend, share_spend, median_days_since_last, avg_orders, avg_spend, what_to_do], format: { customers: int, share_customers: pct, net_spend: num, share_spend: pct, median_days_since_last: int, avg_orders: num, avg_spend: num } }
+{ data: rfm_segments, columns: [segment, customers, share_customers, net_spend, share_spend, median_days_since_last, avg_orders, avg_spend, what_to_do], format: { customers: int, share_customers: pct, net_spend: gbp, share_spend: pct, median_days_since_last: int, avg_orders: num, avg_spend: gbp } }
+```
+
+### Win-back list for marketing
+
+```sql winback "At risk and Can't lose them customers, biggest past spenders first"
+SELECT customer_id, segment, orders, net_spend, recency_days
+FROM rfm
+WHERE segment IN ('At risk', 'Can''t lose them')
+ORDER BY net_spend DESC, customer_id
+```
+
+```sql winback_summary "Win-back list size"
+SELECT count(*) AS customers, sum(net_spend) AS past_spend, median(recency_days) AS median_days FROM winback
+```
+
+The win-back list has **{{winback_summary.customers | int}} customers** who spent {{winback_summary.past_spend | gbp_short}} with us and last ordered a median of {{winback_summary.median_days | int}} days ago. The full list is the `winback` block (see Notes to download it).
+
+```table
+{ data: winback, columns: [customer_id, segment, orders, net_spend, recency_days], limit: 10, format: { customer_id: text, orders: int, net_spend: gbp, recency_days: int } }
 ```
 
 ## 5. What do cancellations and returns cost?
@@ -412,15 +431,15 @@ FROM b
 ```
 
 ```kpi
-- { label: "Products cancelled or returned (£)", value: cancel_summary.product_cancel, format: num }
+- { label: "Products cancelled or returned", value: cancel_summary.product_cancel, format: gbp_short }
 - { label: "As share of gross product sales", value: cancel_summary.cancel_rate, format: pct }
-- { label: "All credits and write-offs (£)", value: cancel_summary.total_credits, format: num }
+- { label: "All credits and write-offs", value: cancel_summary.total_credits, format: gbp_short }
 ```
 
-Over the two years, **£{{cancel_summary.product_cancel | num}}** of product sales were cancelled or returned — **{{cancel_summary.cancel_rate | pct}}** of gross product sales. £{{cancel_summary.bulk_cancel | num}} of that is just two giant orders ({{bulk.q1 | int}} × {{bulk.d1 | text}} and {{bulk.q2 | int}} × {{bulk.d2 | text}}) that were reversed soon after being placed; without them the rate is {{cancel_summary.cancel_rate_ex_bulk | pct}}. Credit notes for products were raised at a rate equal to {{cancel_summary.notes_per_order | pct}} of the number of orders, and {{cancel_summary.customers_cancelling | pct}} of customers cancelled something at least once. On top of product returns, another **£{{cancel_summary.other_credits | num}}** went out as fees, manual credits, refunded postage and bad debt, bringing all credits and write-offs to £{{cancel_summary.total_credits | num}}.
+Over the two years, **{{cancel_summary.product_cancel | gbp_short}}** of product sales were cancelled or returned — **{{cancel_summary.cancel_rate | pct}}** of gross product sales. {{cancel_summary.bulk_cancel | gbp_short}} of that is just two giant orders ({{bulk.q1 | int}} × {{bulk.d1 | text}} and {{bulk.q2 | int}} × {{bulk.d2 | text}}) that were reversed soon after being placed; without them the rate is {{cancel_summary.cancel_rate_ex_bulk | pct}}. Credit notes for products were raised at a rate equal to {{cancel_summary.notes_per_order | pct}} of the number of orders, and {{cancel_summary.customers_cancelling | pct}} of customers cancelled something at least once. On top of product returns, another **{{cancel_summary.other_credits | gbp_short}}** went out as fees, manual credits, refunded postage and bad debt, bringing all credits and write-offs to {{cancel_summary.total_credits | gbp_short}}.
 
 ```chart
-{ type: bar, data: credits, x: category, y: cost, variant: horizontal, format: num, title: "What credits and write-offs cost (£)" }
+{ type: bar, data: credits, x: category, y: cost, variant: horizontal, format: gbp_short, title: "What credits and write-offs cost (£)" }
 ```
 
 ```sql monthly_cancel "Monthly cancellation rate"
@@ -446,7 +465,7 @@ LIMIT 15
 ```
 
 ```table
-{ data: top_cancelled, columns: [stockcode, description, cancelled_value, cancelled_units, credit_notes], format: { cancelled_value: num, cancelled_units: int, credit_notes: int } }
+{ data: top_cancelled, columns: [stockcode, description, cancelled_value, cancelled_units, credit_notes], format: { cancelled_value: gbp, cancelled_units: int, credit_notes: int } }
 ```
 
 ## Notes
@@ -461,4 +480,5 @@ SELECT count(*) AS lines FROM items WHERE kind = 'stock_adjustment'
 - **Customers**: about a fifth of sales lines have no customer ID (guest checkout); they count in sales and country figures but not in retention or segments.
 - **Retention**: a customer's cohort is the month of their first order seen in this data. "Mth N" = share of the cohort who bought in the Nth month after it. Nov 2011 is the last full month; later months show blank. The Dec 2009 cohort includes customers who bought before the data starts.
 - **Segments** (RFM): each customer gets a 1–5 score for recency (days since last order, as of 10 Dec 2011), frequency (number of orders) and spend (net), by rank among all customers. Segments use the recency and frequency scores with the standard RFM segment map; customers whose purchases were all cancelled are listed separately.
+- **Win-back CSV**: `tracebook export --block winback winback.csv` writes every customer on the list (the table above shows the top 10).
 - The 12-month comparison uses Dec 2009–Nov 2010 vs Dec 2010–Nov 2011 so both periods are full and include one holiday season.

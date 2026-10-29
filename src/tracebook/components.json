@@ -95,7 +95,7 @@
     "x": "category / label column (not used by radial)",
     "y": "value column, or a list of value columns (series); combo: list of {col, mark, label?}, band col is [low, high]",
     "variant": "optional; first variant listed is the default",
-    "format": "optional value format: int num pct inr inr_short usd",
+    "format": "optional value format: int num pct inr inr_short usd usd_short gbp gbp_short",
     "zero": "optional; line/combo y axis starts at 0 (default true); false fits the axis to the data",
     "title": "optional card title",
     "description": "optional card subtitle"

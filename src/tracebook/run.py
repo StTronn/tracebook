@@ -533,3 +533,7 @@ def _check_prose(b: Block, nb: Notebook) -> None:
             nb.diags.append(Diag(b.line + n, "LITERAL_NUMBER_IN_PROSE",
                                  f"{tok!r} is typed into the text; compute it in a block and write "
                                  f"{{{{block.column}}}} so it can't go stale", "error" if hard else "warning", b.id))
+        for m in re.finditer(r"\{\{.*?\}\}", re.sub(r"`[^`]*`", "", line)):
+            if not INTERP.fullmatch(m[0]):                 # e.g. {{t[2].n}}: not a ref, would render as raw text
+                nb.diags.append(Diag(b.line + n, "BAD_REF", f"{m[0]!r} is not a reference; use {{{{block.column | fmt}}}} "
+                                     "on a 1-row block (pick the row in SQL, not with [n])", "error", b.id))

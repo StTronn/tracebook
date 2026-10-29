@@ -73,7 +73,7 @@ show: Model!A1:B7
 ```table
 { data: methods, columns: [method, success_rate], sort: lost_inr desc, format: { success_rate: pct } }
 ```
-Prose: Paid conversion was **{{funnel.conv | pct}}**.   ← formats: int num pct inr inr_short usd date text
+Prose: Paid conversion was **{{funnel.conv | pct}}**.   ← formats: int num pct inr inr_short usd usd_short gbp gbp_short date text
 ````
 
 ## Rules that keep numbers correct

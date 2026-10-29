@@ -102,6 +102,13 @@ def test_literal_number_in_prose_is_flagged(demo):
     assert len(d) == 1 and d[0]["line"] == 7 and "'64.0%'" in d[0]["message"]
 
 
+def test_unsupported_ref_syntax_in_prose_is_flagged(demo):
+    _edit(demo, "# Checkout funnel", "# Checkout funnel\n\nSecond method: {{methods[1].payments}}; `{{literal}}` is code.")
+    assert main(["check"]) == 1
+    d = [d for d in results(demo)["diagnostics"] if d["code"] == "BAD_REF"]
+    assert len(d) == 1 and d[0]["line"] == 7 and "methods[1]" in d[0]["message"]
+
+
 def test_python_block_must_return_dataframe_with_line(demo):
     _edit(demo, 'out["conversion"] = out["paid"] / out["orders"]\nreturn out', 'return 42')
     assert main(["check"]) == 1
@@ -157,3 +164,6 @@ def test_values_exact():
     assert to_json(Decimal("0.10")) == "0.10"
     assert fmt(182200, "inr") == "₹1,82,200" and fmt(1240, "inr") == "₹1,240" and fmt(-999, "inr") == "-₹999"
     assert fmt(Decimal("246000"), "inr_short") == "₹2.46L" and fmt(0.6395, "pct") == "64.0%"
+    assert fmt(Decimal("9352019.85"), "gbp_short") == "£9.35M" and fmt(-1234.5, "gbp") == "-£1,234.50"
+    assert fmt(Decimal("999999.996"), "gbp_short") == "£1.00M" and fmt(994, "usd_short") == "$994"
+    assert fmt(Decimal("2.5e9"), "usd_short") == "$2.50B" and fmt(0, "gbp_short") == "£0"

@@ -55,7 +55,8 @@ def _dec(v) -> Decimal | None:
         return None
 
 
-FORMATS = ("int", "num", "pct", "inr", "inr_short", "usd", "date", "text")
+FORMATS = ("int", "num", "pct", "inr", "inr_short", "usd", "usd_short", "gbp", "gbp_short", "date", "text")
+_SHORT = ((Decimal(10**9), "B"), (Decimal(10**6), "M"), (Decimal(10**3), "K"))
 
 
 def fmt(v, kind: str | None = None, dtype: str = "") -> str:
@@ -84,8 +85,14 @@ def fmt(v, kind: str | None = None, dtype: str = "") -> str:
             if a >= size:
                 return f"{sign}₹{(a / size).quantize(Decimal('0.01'))}{unit}"
         return f"{sign}₹{int(a.quantize(Decimal(1)))}"
-    if kind == "usd":
-        return ("-$" if d < 0 else "$") + f"{abs(d).quantize(Decimal('0.01')):,}"
+    if kind in ("usd", "gbp"):
+        return ("-" if d < 0 else "") + ("$" if kind == "usd" else "£") + f"{abs(d).quantize(Decimal('0.01')):,}"
+    if kind in ("usd_short", "gbp_short"):
+        a, sign, cur = abs(d), "-" if d < 0 else "", "$" if kind == "usd_short" else "£"
+        for size, unit in _SHORT:
+            if (a / size).quantize(Decimal("0.01")) >= 1:      # compare after rounding: 999,999.996 → £1.00M, not £1000.00K
+                return f"{sign}{cur}{(a / size).quantize(Decimal('0.01'))}{unit}"
+        return f"{sign}{cur}{int(a.quantize(Decimal(1)))}"
     raise ValueError(f"unknown format {kind!r}; use one of {', '.join(FORMATS)}")
 
 
