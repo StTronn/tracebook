@@ -1,7 +1,6 @@
 ---
 name: tracebook
-description: Data notebooks with the `tracebook` CLI for questions from data files or databases (CSV, Excel, JSON, SQLite, Parquet) — one number, a result table, a funnel or a report. SQL/Python/spreadsheet-model blocks where every number traces to the query that computed it; answer files via `tracebook export --block <id> <file.csv>`, reports via `tracebook export`.
-when_to_use: Any data question — how many, count, total, average, top, funnel, conversion, cohort, sessions, users, revenue, a result CSV, a report or dashboard — or mentions of a tracebook project or notebook.md.
+description: Build data notebooks/reports from data files or databases (CSV, Excel, JSON, SQLite, Parquet — payment exports, sales sheets, CRM dumps) with the `tracebook` CLI — SQL, Python and spreadsheet-model blocks, KPIs, charts, tables, every number traceable to the block that computed it, exported as a shareable HTML report (`tracebook export`) or a block's result as CSV (`tracebook export --block <id> <file.csv>`). Use when the user wants analysis, a dashboard, a funnel, cohorts, a what-if model or a report built from data, or mentions a tracebook project / notebook.md.
 allowed-tools: Bash(tracebook:*), Bash(uv tool install:*)
 ---
 
