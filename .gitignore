@@ -22,3 +22,4 @@ node_modules/
 
 # workspace state of the example workspaces (database, results, history) is rebuilt by `tracebook import` / `check`
 examples/*/.tracebook/
+examples/online-retail/data/

@@ -95,4 +95,5 @@ harbor view evals/jobs                                                # browse r
 | `tests/` | `uv run pytest` |
 | `evals/` | Harbor adapter for Spider2-lite, setup configs, runner |
 | `examples/razorpay-demo/` | example workspace (`tracebook import data/*.xlsx && tracebook check` rebuilds it) |
+| `examples/online-retail/` | customer-insights notebook made by Claude Code from [UCI Online Retail II](https://archive.ics.uci.edu/dataset/502/online+retail+ii) (CC BY 4.0; put `online_retail_II.xlsx` in `data/`, then `tracebook init . --tz Europe/London && tracebook import data/* && tracebook check`) |
 | `docs/` | screenshots, demo video |
