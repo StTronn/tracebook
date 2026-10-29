@@ -2,13 +2,12 @@
 
 Agent-native data notebook. You ask Claude Code a question about your data files (CSV, Excel, JSON, SQLite, Parquet). It answers inside a notebook of SQL / Python / `.xlsx`-model blocks run on DuckDB. Every number in the answer traces back to the block that computed it, and you can check it, comment on it, and rerun it on new data.
 
-| Notebook view: blocks, queries, results, data browser | Report view: the same notebook as a shareable report |
-|---|---|
-| ![notebook view](docs/notebook-view.png) | ![report view](docs/report-view.png) |
+![notebook view](docs/notebook-view.png)
+*Notebook view of `examples/online-retail/`: a customer-insights notebook Claude Code built from the UCI Online Retail II data. Every £ figure links to the block that computed it.*
 
 ![tracebook demo](docs/tracebook_demo.gif)
 
-Full-resolution video: [docs/tracebook_demo.mp4](docs/tracebook_demo.mp4). The screenshots are the example in `examples/razorpay-demo/` (Razorpay checkout funnel from dashboard exports).
+Full-resolution video: [docs/tracebook_demo.mp4](docs/tracebook_demo.mp4). The video shows `examples/razorpay-demo/` (Razorpay checkout funnel from dashboard exports).
 
 ## Install
 ```bash
